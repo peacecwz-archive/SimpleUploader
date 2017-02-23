@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -66,7 +67,7 @@ namespace SimpleUploader
                             PublicAccess = BlobContainerPublicAccessType.Blob
                         });
 
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(Path.GetFileName(FilePath));
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(FriendlyUrl(Path.GetFileNameWithoutExtension(FilePath))+ Path.GetExtension(FilePath));
             if (blockBlob.Exists())
                 blockBlob = container.GetBlockBlobReference(Path.GetFileNameWithoutExtension(FilePath) + Guid.NewGuid().ToString().Split('-')[0] + Path.GetExtension(FilePath));
 
@@ -156,6 +157,24 @@ namespace SimpleUploader
             if (string.IsNullOrEmpty(UploadedUrl)) return;
             Clipboard.SetText(UploadedUrl);
             btnCopyURL.Enabled = true;
+        }
+
+        public string FriendlyUrl(string text)
+        {
+            if (String.IsNullOrEmpty(text)) return "";
+            text = Regex.Replace(text, @"\s+", "-");
+            text = Regex.Replace(text, @"\-{2,}", "-");
+
+            text = text.ToLower();
+            text = Regex.Replace(text, @"&\w+;", "");
+            text = Regex.Replace(text, @"[^a-z0-9\-\s]", "");
+            text = text.Replace(' ', '-');
+            text = Regex.Replace(text, @"-{2,}", "-");
+            text = text.TrimStart(new[] { '-' });
+            if (text.Length > 80)
+                text = text.Substring(0, 79);
+            text = text.TrimEnd(new[] { '-' });
+            return text;
         }
     }
 
