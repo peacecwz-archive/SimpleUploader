@@ -129,16 +129,6 @@ namespace SimpleUploader
                 if (fileStream != null)
                     fileStream.Close();
             }
-
-            /*try
-            {
-
-                await blockBlob.UploadFromFileAsync(FilePath);
-
-                Clipboard.SetText(blockBlob.Uri.ToString());
-                btnCopyURL.Enabled = true;
-            }
-            catch { }*/
         }
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
